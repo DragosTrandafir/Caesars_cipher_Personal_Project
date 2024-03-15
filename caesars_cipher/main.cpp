@@ -5,6 +5,8 @@
 using namespace std;
 
 float* alphabet_distribution(ifstream& f) {
+    // this function creates an array with the frequency of the letters
+   // in the English alphabet, 0 is the index of frequency of 'a', 1 is the index of frequency of 'b' in the array etc...
     float* arr = new float[26];
     float x;
     int i = 0;
@@ -16,6 +18,9 @@ float* alphabet_distribution(ifstream& f) {
 }
 
 float* string_distribution(const char* str) {
+    /* this function uses a frequency array to measure how often each letter appears in a text, 
+    taking into consideration only lower-case and upper-case letters.
+    */
     float* str_arr = new float[26];
     for (int i = 0; i < 26; i++)
         str_arr[i]=0;
@@ -27,18 +32,18 @@ float* string_distribution(const char* str) {
     return str_arr;
 }
 float chi_square_distance(float* arr1, float* arr2){
+	// here we calculate the Chi-square distance between the 2 arrays formed before, by the formula Χ² = Σ [ (O_i – E_i)² / E_i ],
+	// where O_i is the number of appearances of the letter in our text and E_i is the number of appearances of the letter in the alphabet
     float s=0.0;
     for(int i=0;i<26;i++)
         s+=((arr1[i]-arr2[i])*(arr1[i]-arr2[i]))/arr2[i];
     return s;
 
 }
+//these 2 functions move a character n positions in the alphabet, one is for the lower-case letters and the other for the upper-case letters
 char convert1(char c, int n) {
 		n = n % 26;
 		return 'a' + (c - 'a' + n) % 26;
-
-
-
 }
 
 char convert2(char c, int n) {
@@ -46,6 +51,15 @@ char convert2(char c, int n) {
 		return 'A' + (c - 'A' + n) % 26;
 
 }
+
+/*
+this is the most complex function in the program, but also the most important:
+we create in the memory 2 strings - one for storing the changed text for every number of positions iterating to the alphabet
+                                  - one for saving the text which has the smallest Chi-square distance with the English alphabet
+So, for every possible number of positions we can move all the letters in our text, we convert the text and check if the Chi-square distance is smaller.
+At the end, we return the changed text or our initial text in case our original text was already 'translated' in English.
+
+	*/
 char* break_cipher(char* str, float* arr){
      char* new_str=new char[strlen(str)];
      char* new_str2=new char[strlen(str)];
@@ -92,7 +106,7 @@ int main() {
     char* s;
     float* str_arr;
     ifstream f("distribution.txt");
-
+    // menu-based interface 
     bool stop=false;
     int option;
     cout<<"The options should be red in order!"<<endl;
@@ -125,6 +139,7 @@ int main() {
             stop=true;
         else cout<<"The option does not exist!"<<endl;
     }
+	// freeing the memory, to avoid memory leaks
     delete[] arr;
     delete[] str_arr;
     delete[] s;
