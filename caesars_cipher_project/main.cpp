@@ -5,13 +5,13 @@
 #include<cmath>
 using namespace std;
 
-void alphabet_distribution(ifstream& f,float* alphabet_letters_frequency) {
+void alphabet_distribution(ifstream& frequency_file,float* alphabet_letters_frequency) {
     // this function creates an array with the frequency of the letters
    // in the English alphabet, 0 is the index of frequency of 'a', 1 is the index of frequency of 'b' in the array etc...
     
     float letter_frequency;
     int letter_index = 0;
-    while (letter_index < 26 && f >> letter_frequency) {
+    while (letter_index < 26 && frequency_file >> letter_frequency) {
         alphabet_letters_frequency[letter_index] = letter_frequency;
         letter_index++;
     }
@@ -114,7 +114,7 @@ int main() {
     float* alphabet_letters_frequency = new float[26];
     char* cipher_string = new char[600];
     float* cipher_letters_frequency = new float[26];
-    ifstream f("distribution.txt");
+    ifstream frequency_file("distribution.txt");
     // menu-based interface
     bool stop = false;
     int option;
@@ -123,7 +123,7 @@ int main() {
         print_menu();
         cin >> option;
         if (option == 1) {
-            alphabet_distribution(f, alphabet_letters_frequency);
+            alphabet_distribution(frequency_file, alphabet_letters_frequency);
             for (int alphabet_letter_index = 0; alphabet_letter_index < 26; alphabet_letter_index++)
                 cout << alphabet_letters_frequency[alphabet_letter_index] << " ";
             cout << endl;
@@ -152,6 +152,6 @@ int main() {
     delete[] alphabet_letters_frequency;
     delete[] cipher_letters_frequency;
     delete[] cipher_string;
-    f.close();
+    frequency_file.close();
     return 0;
 }
