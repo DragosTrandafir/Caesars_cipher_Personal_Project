@@ -5,17 +5,17 @@
 #include<cmath>
 using namespace std;
 
-float* alphabet_distribution(ifstream& f) {
+void alphabet_distribution(ifstream& f,float* alphabet_letters_frequency) {
     // this function creates an array with the frequency of the letters
    // in the English alphabet, 0 is the index of frequency of 'a', 1 is the index of frequency of 'b' in the array etc...
-    float* alphabet_letters_frequency = new float[26];
+    
     float letter_frequency;
     int letter_index = 0;
     while (letter_index < 26 && f >> letter_frequency) {
         alphabet_letters_frequency[letter_index] = letter_frequency;
         letter_index++;
     }
-    return alphabet_letters_frequency;
+    
 }
 
 float* string_distribution(const char* given_cipher_string) {
@@ -120,19 +120,19 @@ int main() {
         print_menu();
         cin >> option;
         if (option == 1) {
-            alphabet_letters_frequency = alphabet_distribution(f);
+            alphabet_distribution(f, alphabet_letters_frequency);
             for (int alphabet_letter_index = 0; alphabet_letter_index < 26; alphabet_letter_index++)
                 cout << alphabet_letters_frequency[alphabet_letter_index] << " ";
             cout << endl;
         }
         else if (option == 2) {
             cin.ignore();
-            //s=new char[600];
+       
             cout << "Read a string:" << endl;
             cin.getline(cipher_string, 599);
             cipher_letters_frequency = string_distribution(cipher_string);
-            for (int i = 0; i < 26; i++)
-                cout << cipher_letters_frequency[i] << " ";
+            for (int alphabet_letter_index = 0; alphabet_letter_index < 26; alphabet_letter_index++)
+                cout << cipher_letters_frequency[alphabet_letter_index] << " ";
             cout << endl;
         }
         else if (option == 3) {
