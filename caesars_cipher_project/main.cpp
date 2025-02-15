@@ -18,19 +18,18 @@ void alphabet_distribution(ifstream& f,float* alphabet_letters_frequency) {
     
 }
 
-float* string_distribution(const char* given_cipher_string) {
+void string_distribution(const char* cipher_string, float* cipher_letters_frequency) {
     /* this function uses a frequency array to measure how often each letter appears in a text,
     taking into consideration only lower-case and upper-case letters.
     */
-    float* cipher_letters_frequency = new float[26];
     for (int letter_index = 0; letter_index < 26; letter_index++)
         cipher_letters_frequency[letter_index] = 0;
-    for (int cipher_letter_index = 0; cipher_letter_index < strlen(given_cipher_string); cipher_letter_index++)
-        if (given_cipher_string[cipher_letter_index] >= 'a' && given_cipher_string[cipher_letter_index] <= 'z')
-            cipher_letters_frequency[int(given_cipher_string[cipher_letter_index]) - 97] += 1;
-        else if (given_cipher_string[cipher_letter_index] >= 'A' && given_cipher_string[cipher_letter_index] <= 'Z')
-            cipher_letters_frequency[int(given_cipher_string[cipher_letter_index]) - 65] += 1;
-    return cipher_letters_frequency;
+    for (int cipher_letter_index = 0; cipher_letter_index < strlen(cipher_string); cipher_letter_index++)
+        if (cipher_string[cipher_letter_index] >= 'a' && cipher_string[cipher_letter_index] <= 'z')
+            cipher_letters_frequency[int(cipher_string[cipher_letter_index]) - 97] += 1;
+        else if (cipher_string[cipher_letter_index] >= 'A' && cipher_string[cipher_letter_index] <= 'Z')
+            cipher_letters_frequency[int(cipher_string[cipher_letter_index]) - 65] += 1;
+    
 }
 float chi_square_distance(float* arr1, float* arr2) {
     // here we calculate the Chi-square distance between the 2 arrays formed before, by the formula Χ² = Σ [ (O_i – E_i)² / E_i ],
@@ -62,37 +61,41 @@ So, for every possible number of positions we can move all the letters in our te
 At the end, we return the changed text or our initial text in case our original text was already 'translated' in English.
 
     */
-char* break_cipher(char* cipher, float* alphabet_letters_frequency) {
-    char* trial_decription = new char[strlen(cipher) + 1];//allocate also de '\0' character
-    char* smallest_chi_decription = new char[strlen(cipher) + 1];
+char* break_cipher(char* cipher_string, float* alphabet_letters_frequency, float* cipher_letters_frequency) {
+    char* trial_decription = new char[strlen(cipher_string) + 1];  // Allocate space for null terminator
+    char* smallest_chi_decription = new char[strlen(cipher_string) + 1];
 
-    float minn_distance, distance;
+    float min_distance, distance;
 
-    minn_distance = chi_square_distance(string_distribution(cipher), alphabet_letters_frequency);
+    string_distribution(cipher_string, cipher_letters_frequency);
+    min_distance = chi_square_distance(cipher_letters_frequency, alphabet_letters_frequency);
+
+    strcpy(smallest_chi_decription, cipher_string); 
+
+    //try all possible shifts from 1 to 25
     for (int nr_shifts = 1; nr_shifts < 26; nr_shifts++) {
-        for (int cipher_letter_index = 0; cipher_letter_index < strlen(cipher) + 1; cipher_letter_index++)
-            if (cipher[cipher_letter_index] <= 'z' && cipher[cipher_letter_index] >= 'a')
-                trial_decription[cipher_letter_index] = convertLowerCase(cipher[cipher_letter_index], nr_shifts);
-            else if (cipher[cipher_letter_index] <= 'Z' && cipher[cipher_letter_index] >= 'A')
-                trial_decription[cipher_letter_index] = convertUpperCase(cipher[cipher_letter_index], nr_shifts);
+        for (int i = 0; i < strlen(cipher_string); i++) {
+            if (cipher_string[i] >= 'a' && cipher_string[i] <= 'z')
+                trial_decription[i] = convertLowerCase(cipher_string[i], nr_shifts);
+            else if (cipher_string[i] >= 'A' && cipher_string[i] <= 'Z')
+                trial_decription[i] = convertUpperCase(cipher_string[i], nr_shifts);
             else
-                trial_decription[cipher_letter_index] = cipher[cipher_letter_index];
+                trial_decription[i] = cipher_string[i];
+        }
+        trial_decription[strlen(cipher_string)] = '\0';  //ensure null termination
 
-        distance = chi_square_distance(string_distribution(trial_decription), alphabet_letters_frequency);
-        if (distance <= minn_distance) {
-            minn_distance = distance;
+        string_distribution(trial_decription, cipher_letters_frequency);
+        distance = chi_square_distance(cipher_letters_frequency, alphabet_letters_frequency);
+
+        //if the new shift has a lower chi-square distance, update result
+        if (distance < min_distance) {
+            min_distance = distance;
             strcpy(smallest_chi_decription, trial_decription);
         }
     }
-    if (minn_distance != chi_square_distance(string_distribution(cipher), alphabet_letters_frequency))
-    {
-        return smallest_chi_decription;
-    }
 
-    else
-        return cipher;
-
-
+    delete[] trial_decription;
+    return smallest_chi_decription;
 }
 void print_menu() {
     cout << endl;
@@ -130,7 +133,7 @@ int main() {
        
             cout << "Read a string:" << endl;
             cin.getline(cipher_string, 599);
-            cipher_letters_frequency = string_distribution(cipher_string);
+            string_distribution(cipher_string, cipher_letters_frequency);
             for (int alphabet_letter_index = 0; alphabet_letter_index < 26; alphabet_letter_index++)
                 cout << cipher_letters_frequency[alphabet_letter_index] << " ";
             cout << endl;
@@ -139,7 +142,7 @@ int main() {
             cout << chi_square_distance(cipher_letters_frequency, alphabet_letters_frequency) << endl;
         }
         else if (option == 4) {
-            cout << break_cipher(cipher_string, alphabet_letters_frequency);
+            cout << break_cipher(cipher_string, alphabet_letters_frequency, cipher_letters_frequency);
         }
         else if (option == 5)
             stop = true;
