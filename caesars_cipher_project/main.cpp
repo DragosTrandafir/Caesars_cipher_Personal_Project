@@ -74,13 +74,13 @@ char* break_cipher(char* cipher_string, float* alphabet_letters_frequency, float
 
     //try all possible shifts from 1 to 25
     for (int nr_shifts = 1; nr_shifts < 26; nr_shifts++) {
-        for (int i = 0; i < strlen(cipher_string); i++) {
-            if (cipher_string[i] >= 'a' && cipher_string[i] <= 'z')
-                trial_decription[i] = convertLowerCase(cipher_string[i], nr_shifts);
-            else if (cipher_string[i] >= 'A' && cipher_string[i] <= 'Z')
-                trial_decription[i] = convertUpperCase(cipher_string[i], nr_shifts);
+        for (int cipher_string_character = 0; cipher_string_character < strlen(cipher_string); cipher_string_character++) {
+            if (cipher_string[cipher_string_character] >= 'a' && cipher_string[cipher_string_character] <= 'z')
+                trial_decription[cipher_string_character] = convertLowerCase(cipher_string[cipher_string_character], nr_shifts);
+            else if (cipher_string[cipher_string_character] >= 'A' && cipher_string[cipher_string_character] <= 'Z')
+                trial_decription[cipher_string_character] = convertUpperCase(cipher_string[cipher_string_character], nr_shifts);
             else
-                trial_decription[i] = cipher_string[i];
+                trial_decription[cipher_string_character] = cipher_string[cipher_string_character];
         }
         trial_decription[strlen(cipher_string)] = '\0';  //ensure null termination
 
